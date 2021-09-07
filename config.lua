@@ -21,7 +21,7 @@ Config.CryptoTransferCommission = {
     ["ggcoin"] = 0.7, --0.7%
     ["devcoin"] = 1.4,--1.4%
 }
-Config.Voip = "tokovoip" -- or mumble or pma-voice
+Config.Voip = "pma-voice" -- or mumble or pma-voice
 Config.Webhooks = {
     ["Camera"] = "https://discord.com/api/webhooks/854797484744245258/SLhwu2xKHnE9H9wk3ign3XZREUREJhXnSniFKL3FPqMguSvVvxZ4lPYcpGUffEvW0pfm",
     ["Twitter"] = "https://discord.com/api/webhooks/851717364915634176/K1Ck2q2gLibjF0C2KpT2Og3_QiM7ciMGUk_Ly1tCQS4sGaw_SeJZ1pqewlpZnyCfGm5v"
