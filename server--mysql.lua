@@ -1292,18 +1292,15 @@ AddEventHandler("hsn-phone-server-SetCarOut",function(plate)
 end)
 
 
+ESX.RegisterServerCallback('hsn-phone-server:GetItemCount', function(source, cb, item)
+	local xPlayer = ESX.GetPlayerFromId(source)
+        local items = xPlayer.getInventoryItem(item)
 
-ESX.RegisterServerCallback("hsn-phone-server:GetItemCount",function(source,cb,item)
-    if item == nil then
-        item = "phone"
-    end
-    local xPlayer = ESX.GetPlayerFromId(source)
-    local CheckItem = xPlayer.getQuantity(item)
-    if CheckItem >= 1 then
-        cb(true)
-        return
-    end
-    cb(false)
+        if items == nil then
+            cb(0)
+        else
+            cb(items.count)
+        end
 end)
 
 RegisterServerEvent("hsn-phone-server-call")
