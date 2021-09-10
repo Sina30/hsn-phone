@@ -659,7 +659,7 @@ AddEventHandler("hsn-phone-server-SendNewTweet",function(data)
                 data.user_photo = twtAcc.photo
                 data.id = result.insertId
                 TriggerClientEvent("hsn-phone-client-SendNewTweet",-1,data)   
-                local message = twtAcc.username.." kişisinden yeni tweet!"
+                local message = twtAcc.username.." tweeted!"
                 TriggerClientEvent("hsn-phone-client:NewNotification",-1,{type = "message",message = message, icon = '<i class="fab fa-twitter"></i>', background = "#00a8ff", app = "Twitter", duration = 3000})
                 TwitterLikes[data.id] = {}
                 TwitterLikes[data.id].togglelikes = {}
@@ -1304,16 +1304,17 @@ end)
 
 
 ESX.RegisterServerCallback("hsn-phone-server:GetItemCount",function(source,cb,item)
-    if item == nil then
-        item = "phone"
-    end
     local xPlayer = ESX.GetPlayerFromId(source)
-    local CheckItem = xPlayer.getQuantity(item)
-    if CheckItem >= 1 then
-        cb(true)
-        return
+
+    if xPlayer ~= nil then
+        local HasPhone = xPlayer.getInventoryItem("phone").count
+
+        if HasPhone >= 1 then
+            cb(true)
+        else
+            cb(false)
+        end
     end
-    cb(false)
 end)
 
 RegisterServerEvent("hsn-phone-server-call")
@@ -2058,7 +2059,7 @@ HSN.SendLog = function(app, webhook, message, photo, playerphoto)
     if image ~= "" then
         data['embeds'][1]['image'] = {['url'] = photo}
     end
-    data['embeds'][1]['description'] = '**Yeni Tweet!** \n ' ..message
+    data['embeds'][1]['description'] = '**New Tweet!** \n ' ..message
     PerformHttpRequest(webhook, function(err, text, headers) end, 'POST', json.encode(data), headers)
 end
 
