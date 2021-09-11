@@ -2520,7 +2520,7 @@ HSN.GetPlayerCars = function() {
                     addClass = "notstored"
                 }
                 $(".cars-container").find("[id="+i+"]").remove();
-                $(".cars-container").append('<div class="cars-index" id='+i+'><div class="carlabel">'+data[i].vehLabel+'</div><div class="carplate">'+data[i].plate+'</div><div class="carinfo '+addClass+'"><div class="carinfo-box">This car doesnt stored!</div><i class="fas fa-map-marker-alt"></i></div></div>')
+                $(".cars-container").append('<div class="cars-index" id='+i+'><div class="carlabel">'+data[i].vehLabel+'</div><div class="carplate">'+data[i].plate+'</div><div class="carinfo '+addClass+'"><div class="carinfo-box">This car isnt stored!</div><i class="fas fa-map-marker-alt"></i></div></div>')
                 $(".cars-container").find("[id="+i+"]").find(".carinfo").data("CarData", data[i])
                 $(".cars-container").find("[id="+i+"]").find(".carinfo").data("stored", addClass)
             } 
@@ -3366,7 +3366,7 @@ HSN.GetMessagePlayers = function() {
             $.each(data, function (i, result) {
                 $(".messages-indexside").find("[phonenumber="+result.number+"]").remove();
                 if (result.lastmessage == "") {
-                    result.lastmessage = '<i class="fas fa-link"></i>' + " Bir belge gönderildi."
+                    result.lastmessage = '<i class="fas fa-link"></i>' + " A document has been sent."
                 }
                 HSN.PlayerMessages[result.number].playerphoto = result.playerphoto
                 $(".messages-indexside").append('<div class="messages-index" href='+result.name+' phonenumber='+result.number+'><div class="messages-index-photo"><img src="'+HSN.CalculateMessagesPhoto(result.playerphoto)+'"></div><div class="messages-name">'+result.name+'</div><div class="messages-index-text">'+result.lastmessage+'</div><div class="messages-index-time">'+HSN.CalculateTime(result.lastmessagetime)+'</div></div>')
@@ -3378,7 +3378,7 @@ HSN.GetMessagePlayers = function() {
     // $.each(HSN.PlayerMessages, function (i, result) {
     //     $(".messages-indexside").find("[phonenumber="+i+"]").remove();
     //     if (result.lastmessage == "") {
-    //         result.lastmessage = '<i class="fas fa-link"></i>' + " Bir belge gönderildi."
+    //         result.lastmessage = '<i class="fas fa-link"></i>' + " A document has been sent."
     //     }
     //     $(".messages-indexside").append('<div class="messages-index" href='+result.name+' phonenumber='+i+'><div class="messages-index-photo"><img src="'+HSN.CalculateMessagesPhoto(result.playerphoto)+'"></div><div class="messages-name">'+result.name+'</div><div class="messages-index-text">'+result.lastmessage+'</div><div class="messages-index-time">'+HSN.CalculateTime(result.lastmessagetime)+'</div></div>')
     // })
