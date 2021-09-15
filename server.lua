@@ -6,7 +6,6 @@ PhoneData = {}
 TwitterAccounts = {}
 PhoneCalls = {}
 Notes = {}
-CryptoCurrency = {}
 AmbulancePatientDatas = {}
 GalleryPhotos = {}
 Bolos = {}
@@ -29,9 +28,7 @@ exports["ghmattimysql"]:ready(function()
             PhoneData[v.identifier].messages = {}
             PhoneData[v.identifier].charinfo.firstname = v.firstname ~= nil and v.firstname or "Unknown"
             PhoneData[v.identifier].charinfo.lastname = v.lastname ~= nil and v.lastname or "Unknown"
-            PhoneData[v.identifier].charinfo.cryptoid = v.cryptoid ~= nil and v.cryptoid or HSN.GenerateCryptoId(v.identifier)
             PhoneData[v.identifier].charinfo.iban = v.iban ~= nil and v.iban or HSN.GenerateIban(v.identifier)
-            PhoneData[v.identifier].CryptoCurrency = v.cryptocurrency ~= nil and json.decode(v.cryptocurrency) or {}
 
             if v.phonedata ~= nil then
                 local phoneData = json.decode(v.phonedata)
@@ -72,18 +69,6 @@ exports["ghmattimysql"]:ready(function()
             end
         end
     end
-    for k,v in pairs(users) do
-        if PhoneData[v.identifier].cryptocurrencytransfers == nil then
-            PhoneData[v.identifier].cryptocurrencytransfers  = {} 
-        end
-        if v.cryptocurrencytransfers ~= nil then
-            v.cryptocurrencytransfers = json.decode(v.cryptocurrencytransfers)
-            for i,j in ipairs(v.cryptocurrencytransfers) do
-
-                table.insert(PhoneData[v.identifier].cryptocurrencytransfers, j)
-            end
-        end
-    end
     
     local mails = exports.ghmattimysql:executeSync('SELECT * FROM hsn_phone_mails', {})
     for k,v in ipairs(mails) do
@@ -109,19 +94,6 @@ exports["ghmattimysql"]:ready(function()
         TwitterAccounts[v.username].password = v.password
         TwitterAccounts[v.username].photo = v.photo
         TwitterAccounts[v.username].username = v.username
-    end
-    local cryptocurrencyfile = json.decode(LoadResourceFile("hsn-phone", "./cryptocurrency.json")) 
-    if cryptocurrencyfile then
-        for k,v in pairs(cryptocurrencyfile) do
-            CryptoCurrency[k] = v
-        end
-    else
-        local saved = SaveResourceFile("hsn-phone", "./cryptocurrency.json", json.encode(Config.CustomCryptoCurrencys), -1)
-        if saved then
-            print("^2hsn-phone | Saved cryptocurrencts to json.")
-        else
-            print("^1hsn-phone | Unknown error for save cryptocurrencts. \n  Change the script name to ^6hsn-phone!")
-        end
     end
 
     local PatientDatas = exports.ghmattimysql:executeSync('SELECT * FROM hsn_phone_ambulancepatients', {})
@@ -201,7 +173,6 @@ HSN.GetPlayerData = function(identifier)
         PhoneData[identifier].charinfo = {}
         PhoneData[identifier].charinfo.firstname = fullname.firstname
         PhoneData[identifier].charinfo.lastname = fullname.lastname
-        PhoneData[identifier].charinfo.cryptoid = HSN.GenerateCryptoId(identifier)
         PhoneData[identifier].charinfo.iban = HSN.GenerateIban(identifier)
         PhoneData[identifier].charinfo.photo = "default"
         PhoneData[identifier].contacts = {}
@@ -210,7 +181,6 @@ HSN.GetPlayerData = function(identifier)
         PhoneData[identifier].identifier = identifier
         PhoneData[identifier].Apps = {}
         PhoneData[identifier].messages = {}
-        PhoneData[identifier].CryptoCurrency = {}
         exports.ghmattimysql:execute('UPDATE users SET phonedata = @phonedata WHERE identifier = @identifier', {
             ['@phonedata'] = json.encode(PhoneData[identifier].charinfo),
             ['@identifier'] = identifier
@@ -257,16 +227,6 @@ HSN.GetPlayerFromIban = function(iban)
         end
     end
     return returnData
-end
-HSN.GetPlayerFromCryptoId = function(cryptoid)
-    if cryptoid ~= nil then
-        for k,v in pairs(PhoneData) do
-            if (v.charinfo.cryptoid  and v.charinfo.cryptoid == cryptoid) then
-                return k
-            end
-        end
-    end
-    return nil
 end
 
 HSN.GenerateCallId = function()
@@ -361,15 +321,6 @@ HSN.GeneratePhoneNumber = function(identifier)
     }) 
     return generated
 end
-
-HSN.GenerateCryptoId = function(identifier)
-    local generated = 'cpt-'..HSN.RandomStr(2)..""..HSN.RandomInt(3)
-    exports.ghmattimysql:execute('UPDATE users SET cryptoid = @cryptoid WHERE identifier = @identifier', {
-        ['@cryptoid'] = generated,
-        ['@identifier'] = identifier
-    }) 
-    return generated
-end 
 
 
 ESX.RegisterServerCallback("hsn-phone-server-getcharinfo",function(source,cb)
@@ -1414,212 +1365,6 @@ AddEventHandler("hsn-phone-server-answercall",function(type)
             end
         end
     end
-end)
-
-
-
-RecentValues = {}
-local fncvalues = {"bitcoin", "devcoin", "ethereum", "ggcoin"}
-Changes = {}
-Citizen.CreateThread(function()
-    PerformHttpRequest("https://api.cryptonator.com/api/ticker/btc-usd", function(param1, param2, param3)
-        param2 = json.decode(param2)
-        local btcprice = tonumber(param2.ticker.price)
-        CryptoCurrency["bitcoin"] = string.format("%.32f", 1 / btcprice)
-    end)
-    PerformHttpRequest("https://api.cryptonator.com/api/ticker/doge-usd", function(param1, param2, param3)
-        param2 = json.decode(param2)
-        local devprice = tonumber(param2.ticker.price)
-        CryptoCurrency["devcoin"] = string.format("%.32f", 1 / devprice)
-    end)
-    PerformHttpRequest("https://api.cryptonator.com/api/ticker/eth-usd", function(param1, param2, param3)
-        param2 = json.decode(param2)
-        local ethprice = tonumber(param2.ticker.price)
-        CryptoCurrency["ethereum"] = string.format("%.32f", 1 / ethprice)
-    end)
-    PerformHttpRequest("https://api.cryptonator.com/api/ticker/xtz-usd", function(param1, param2, param3)
-        param2 = json.decode(param2)
-        local ggcoinprice = tonumber(param2.ticker.price)
-        CryptoCurrency["ggcoin"] = string.format("%.32f", 1 / ggcoinprice)
-    end)
-    while true do
-        Citizen.Wait(60000)
-        PerformHttpRequest("https://api.cryptonator.com/api/ticker/btc-usd", function(param1, param2, param3)
-            param2 = json.decode(param2)
-            local btcprice = tonumber(param2.ticker.price)
-            CryptoCurrency["bitcoin"] = string.format("%.32f", 1 / btcprice)
-        end)
-        PerformHttpRequest("https://api.cryptonator.com/api/ticker/doge-usd", function(param1, param2, param3)
-            param2 = json.decode(param2)
-            local devprice = tonumber(param2.ticker.price)
-            CryptoCurrency["devcoin"] = string.format("%.32f", 1 / devprice)
-        end)
-        PerformHttpRequest("https://api.cryptonator.com/api/ticker/eth-usd", function(param1, param2, param3)
-            param2 = json.decode(param2)
-            local ethprice = tonumber(param2.ticker.price)
-            CryptoCurrency["ethereum"] = string.format("%.32f", 1 / ethprice)
-        end)
-        PerformHttpRequest("https://api.cryptonator.com/api/ticker/xtz-usd", function(param1, param2, param3)
-            param2 = json.decode(param2)
-            local ggcoinprice = tonumber(param2.ticker.price)
-            CryptoCurrency["ggcoin"] = string.format("%.32f", 1 / ggcoinprice)
-        end)
-        for i,j in pairs(fncvalues) do
-            while CryptoCurrency[j] == nil do
-                Citizen.Wait(100)
-            end
-            if RecentValues[j] == nil then
-                RecentValues[j] = {}
-                RecentValues[j] = CryptoCurrency[j]
-            end
-            Changes[j] = {}
-            
-            if RecentValues[j] > CryptoCurrency[j] then
-                Changes[j].change = "up"
-            elseif RecentValues[j] < CryptoCurrency[j] then
-                Changes[j].change = "down"
-            elseif RecentValues[j] == CryptoCurrency[j] then
-                Changes[j].change = "same"
-            end
-        end
-        TriggerClientEvent("hsn-phone-client-updateCryptoChanges",-1,Changes)
-    end
-end)
-
-
-RegisterServerEvent("hsn-phone-server-BuyCryptoCurrency")
-AddEventHandler("hsn-phone-server-BuyCryptoCurrency",function(type, amount, crypto)
-    print(type, amount, crypto)
-    local src = source
-    local Player = ESX.GetPlayerFromId(src)
-    local cryptoData = PhoneData[Player.identifier].CryptoCurrency
-    if type and amount and crypto then
-        if amount == "" then return end
-        amount = tonumber(amount)
-        if amount == 0 then return end
-        if cryptoData then
-            if cryptoData[crypto] then
-                if type == "buy" then
-                    if Player.getAccount("bank").money >= amount then
-                        Player.removeAccountMoney("bank", amount)
-                        local value = HSN.CalculateCryptoValue(crypto, amount)
-                        print("value "..value)
-                        PhoneData[Player.identifier].CryptoCurrency[crypto] = PhoneData[Player.identifier].CryptoCurrency[crypto] + value
-                        exports.ghmattimysql:execute('UPDATE users SET cryptocurrency = @cryptocurrency WHERE identifier = @identifier', {
-                            ['@cryptocurrency'] = json.encode(PhoneData[Player.identifier].CryptoCurrency),
-                            ['@identifier'] = Player.identifier
-                        }) 
-                        TriggerClientEvent("hsn-phone-client-UpdateMyCryptos",src, crypto, PhoneData[Player.identifier].CryptoCurrency[crypto])
-                        local valueformessage = HSN.MathRound(value,4)
-                        local message = "You bought "..valueformessage.." "..crypto.." for $"..amount.."!"
-                        TriggerClientEvent("hsn-phone-client:NewNotification",source,{type = "message",message = message, icon = '<i class="fas fa-layer-group"></i>', background = "#e07a5f", app = "Finance"})
-                        TriggerClientEvent("hsn-phone-client-UpdateBankBalance",source, Player.getAccount("bank").money)
-                    else
-                        TriggerClientEvent("hsn-phone-client-PhoneShowNotification",src, "You don't have enough money!", "error")
-                    end
-                elseif type == "sell" then
-                    if PhoneData[Player.identifier].CryptoCurrency[crypto] >= amount then
-                        local BackPrice = (amount / CryptoCurrency[crypto])
-                        BackPrice = math.floor(BackPrice)
-                        PhoneData[Player.identifier].CryptoCurrency[crypto] = string.format("%.32f", PhoneData[Player.identifier].CryptoCurrency[crypto] - amount) 
-                        Player.addAccountMoney("bank", BackPrice)
-                        local message = "You sold "..HSN.MathRound(amount,7).." "..crypto.."!"
-                        TriggerClientEvent("hsn-phone-client:NewNotification",source,{type = "message",message = message, icon = '<i class="fas fa-layer-group"></i>', background = "#e07a5f", app = "Finance"})
-                        TriggerClientEvent("hsn-phone-client-UpdateMyCryptos",src, crypto, PhoneData[Player.identifier].CryptoCurrency[crypto])
-                        TriggerClientEvent("hsn-phone-client-UpdateBankBalance",source, Player.getAccount("bank").money)
-                        exports.ghmattimysql:execute('UPDATE users SET cryptocurrency = @cryptocurrency WHERE identifier = @identifier', {
-                            ['@cryptocurrency'] = json.encode(PhoneData[Player.identifier].CryptoCurrency),
-                            ['@identifier'] = Player.identifier
-                        }) 
-                    end
-                end
-            end
-        end
-    end
-end)
-
-
-
-RegisterServerEvent("hsn-phone-server-TransferCrypto")
-AddEventHandler("hsn-phone-server-TransferCrypto",function(crypto, amount, targetCryptoId)
-    local src = source
-    local Player = ESX.GetPlayerFromId(src)
-    local cryptoData = PhoneData[Player.identifier].CryptoCurrency
-    if type and amount and crypto then
-        if amount == "" then return end
-        amount = tonumber(amount)
-        if amount == nil then
-            return
-        end
-        if amount == 0 or amount < 0 then return end
-        if cryptoData then
-            if cryptoData[crypto] then
-                local TargetPlayer = HSN.GetPlayerFromCryptoId(targetCryptoId)
-                if TargetPlayer == nil then
-                    return  TriggerClientEvent("hsn-phone-client-PhoneShowNotification",src, "We can't find this id!", "error")
-                end
-                if PhoneData[Player.identifier].CryptoCurrency[crypto] >= amount then
-                    PhoneData[Player.identifier].CryptoCurrency[crypto] = PhoneData[Player.identifier].CryptoCurrency[crypto] - amount
-                    PhoneData[TargetPlayer].CryptoCurrency[crypto] = PhoneData[TargetPlayer].CryptoCurrency[crypto] + (amount - HSN.CalculateCryptoCommission(crypto, amount))
-                    TriggerClientEvent("hsn-phone-client-UpdateMyCryptos",src, crypto, PhoneData[Player.identifier].CryptoCurrency[crypto])
-                    local komisyon = HSN.CalculateCryptoCommission(crypto, amount)
-                    local gonderdigimpara = amount
-                    if ESX.GetPlayerFromIdentifier(TargetPlayer) then
-                        local message = HSN.MathRound(amount - HSN.CalculateCryptoCommission(crypto, amount),4).." came to your "..crypto.." acc!"
-                        --TriggerClientEvent("hsn-phone-client:NewNotification",ESX.GetPlayerFromIdentifier(TargetPlayer).source,{type = "message",message = message, icon = '<i class="fas fa-layer-group"></i>', background = "#e07a5f", app = "Finance"})
-                    end
-                    local message = "You have transferred"..HSN.MathRound(amount,4)
-                    TriggerClientEvent("hsn-phone-client:NewNotification",source,{type = "message",message = message, icon = '<i class="fas fa-layer-group"></i>', background = "#e07a5f", app = "Finance"})
-                    exports.ghmattimysql:execute('UPDATE users SET cryptocurrency = @cryptocurrency WHERE identifier = @identifier', {
-                        ['@cryptocurrency'] = json.encode(PhoneData[Player.identifier].CryptoCurrency),
-                        ['@identifier'] = Player.identifier
-                    }) 
-                    exports.ghmattimysql:execute('UPDATE users SET cryptocurrency = @cryptocurrency WHERE identifier = @identifier', {
-                        ['@cryptocurrency'] = json.encode(PhoneData[TargetPlayer].CryptoCurrency),
-                        ['@identifier'] = TargetPlayer
-                    })
-                    local data = {}
-                    data.owner = Player.identifier
-                    data.crypto = crypto
-                    data.amount = amount
-                    data.target = targetCryptoId
-                    table.insert(PhoneData[Player.identifier].cryptocurrencytransfers, data)
-                    data.id = #PhoneData[Player.identifier].cryptocurrencytransfers
-                    exports.ghmattimysql:execute('UPDATE users SET cryptocurrencytransfers = @cryptocurrencytransfers WHERE identifier = @identifier', {
-                        ['@cryptocurrencytransfers'] = json.encode(PhoneData[Player.identifier].cryptocurrencytransfers),
-                        ['@identifier'] = Player.identifier
-                    })
-                    
-                    TriggerClientEvent("hsn-phone-clinet:AddNewCryptoTransfer",source,data)
-                else
-                    TriggerClientEvent("hsn-phone-client-PhoneShowNotification",src, "You don't have enough "..crypto.." !", "error")
-                end
-            end
-        end
-    end
-end)
-
-
-HSN.CalculateCryptoCommission = function(crypto, amount)
-    local commission = Config.CryptoTransferCommission[crypto]
-    if commission == nil then commission = 0 end
-    return (amount / 100) * commission 
-end
-
-
-
-HSN.CalculateCryptoValue = function(crypto, amount)
-    if crypto and amount then
-        if CryptoCurrency[crypto] then
-            return CryptoCurrency[crypto] * amount
-        end
-    end
-end
-
-
-ESX.RegisterServerCallback("hsn-phone-server-GetCryptoTransactions",function(source,cb)
-    local Player = ESX.GetPlayerFromId(source)
-    cb(PhoneData[Player.identifier].cryptocurrencytransfers)
 end)
 
 
