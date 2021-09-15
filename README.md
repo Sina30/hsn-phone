@@ -17,6 +17,10 @@ exports("ready", function (callback)
   end)
 end)
 ```
-https://hasan.tebex.io/package/4658624
+# NOTE
+Do not buy this phone, it is a mess. I am fixing this as best as I can. It's a shame that this was being sold for the price it was and so many things unfinished or lazy left in and not cleaned up. The version on this github does indeed work (calls and such) but there are definitely some performance issues among other weirdness.
 
-https://discord.gg/6FQhKDXBJ6
+# TO-DO
+- [ ] Switch to [oxmysql](https://github.com/overextended/oxmysql) - A PR for this is welcomed.
+- [ ] Finish cleaning up bad css/html
+- [ ] Add New Apps
