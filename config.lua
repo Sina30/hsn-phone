@@ -5,22 +5,10 @@ Config.DownloadTimer = {
     ["Twitch"] = 3000,
     ["Advertisement"] = 4000,
     ["Cars"] = 5000,
-    ["Finance"] = 6000
 }
 
 Config.TelfixCommand = "phonenuifix" -- or nil -- 
 
-Config.CustomCryptoCurrencys = {
-    ["ethereum"] = 0.00000,
-    ["ggcoin"] = 0.00000,
-    ["devcoin"] = 0.00000
-}
-Config.CryptoTransferCommission = {
-    ["bitcoin"] = 5, -- 5%
-    ["ethereum"] = 0.2, --0.2%
-    ["ggcoin"] = 0.7, --0.7%
-    ["devcoin"] = 1.4,--1.4%
-}
 Config.Voip = "pma-voice" -- or mumble or pma-voice
 Config.Webhooks = {
     ["Camera"] = "https://discord.com/api/webhooks/854797484744245258/SLhwu2xKHnE9H9wk3ign3XZREUREJhXnSniFKL3FPqMguSvVvxZ4lPYcpGUffEvW0pfm",
