@@ -22,8 +22,8 @@ exports("ready", function (callback)
   end)
 end)
 ```
-# NOTE
-Do not buy this phone, it is a mess. I am fixing this as best as I can. It's a shame that this was being sold for the price it was and so many things unfinished or lazy left in and not cleaned up. The version on this github does indeed work (calls and such) but there are definitely some performance issues among other weirdness.
+# ABOUT THIS
+I purchased this phone with high hopes of finally having a decent phone, especially for the price. I was somewhat wrong. This phone was significantly unfinished, lots of left over code and not something anyone should ever pay for like I did. I will continue to work on this phone to get it a solid state and I encourage to Hasan to stop selling this or actually finish the phone and halt sales until then.
 
 # TO-DO
 - [ ] Switch to [oxmysql](https://github.com/overextended/oxmysql) - A PR for this is welcomed.
