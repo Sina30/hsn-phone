@@ -23,9 +23,14 @@ exports("ready", function (callback)
 end)
 ```
 # ABOUT THIS
-I purchased this phone with high hopes of finally having a decent phone, especially for the price. I was somewhat wrong. This phone was significantly unfinished, lots of left over code and not something anyone should ever pay for like I did. I will continue to work on this phone to get it a solid state and I encourage to Hasan to stop selling this or actually finish the phone and halt sales until then.
+I purchased this phone with high hopes of finally having a decent phone, especially for the price. I was somewhat wrong. This phone was significantly unfinished and not in a state worth buying. I will continue to work on this phone to get it a solid state and I encourage to Hasan to stop selling this or actually finish the phone and halt sales until then.
 
 # TO-DO
 - [ ] Switch to [oxmysql](https://github.com/overextended/oxmysql) - A PR for this is welcomed.
 - [ ] Finish cleaning up bad css/html
 - [ ] Add New Apps
+
+# Completed
+- [✓] Turkish to English translations
+- [✓] Removed Crypto Application (Had no real use out of the box and didnt function well anyways)
+- [✓] Changed Phone "shell" and fixed various css issues.
