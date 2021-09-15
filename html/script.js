@@ -13,7 +13,6 @@ var currentstateHeader = "police"
 var currentcarHeader = "info"
 var currentContactId = 0
 var inCall = false
-var CurrentCryptoValue = "bitcoin"
 var CurrentAmbulanceHeader = "CreateRecord"
 var CurrentPoliceHeader = "pbuttons-citizen"
 var CurrentContactsHeader = "contacts"
@@ -30,7 +29,6 @@ let MessageLocalIds = {}
 totalBill = 0
 totalBillPrice = 0
 HSN.IsPhoneOpened = false
-HSN.CryptoCommissions = {}
 HSN.PhoneBackgrounds = {}
 HSN.PlayedMusics = {}
 HSN.TwitterData = {}
@@ -61,13 +59,9 @@ window.addEventListener('message', function(event) {
         HSN.SetPhoneNumber(event.data.result.phonenumber)
         HSN.SetCharacterName(event.data.result.charinfo.firstname,event.data.result.charinfo.lastname)
         HSN.SetEmail(event.data.result.charinfo.firstname.trim()+"_"+event.data.result.charinfo.lastname.trim())
-        HSN.SetCryptoName(event.data.result.charinfo.firstname,event.data.result.charinfo.lastname,event.data.result.charinfo.cryptoid, event.data.result.charinfo.bankbalance)
-        HSN.SetCryptoData(event.data.result.CryptoCurrency)
         $(".ambulance-welcome").html("Welcome "+ event.data.result.charinfo.firstname+ " " +event.data.result.charinfo.lastname)
         $(".ambulance-job-label").html(event.data.result.job)
-        HSN.CryptoCommissions = event.data.cryptoCommissions
         HSN.PhoneBackgrounds = event.data.PhoneBackgrounds
-        $(".commission").html("Commission = "+HSN.CryptoCommissions[CurrentCryptoValue]+"%")
         HSN.SetupApps(event.data.result.Apps)
         HSN.SetupBackgrounds(event.data.PhoneBackgrounds)
 
@@ -147,12 +141,8 @@ window.addEventListener('message', function(event) {
         HSN.PhoneShowNotification(event.data.reason,"error")
     } else if (event.data.message == "call-answer") {
         HSN.AnswerCall(event.data.type, event.data.photo, event.data.id)
-    } else if (event.data.message == "UpdateCryptoValue") {
-        HSN.UpdateCryptoValues(event.data.crypto, event.data.value)
     } else if (event.data.message == "PhoneShowNotification") {
         HSN.PhoneShowNotification(event.data.reason,event.data.type)
-    } else if (event.data.message == "AddNewCryptoTransfer") {
-        HSN.AddNewCryptoTransfer(event.data.data)
     } else if (event.data.message == "DeleteBill") {
         HSN.DeleteBill(event.data.id)
     } else if (event.data.message == "CreateNewPatientData") {
@@ -200,14 +190,10 @@ window.addEventListener('message', function(event) {
         if (HSN.TwitterData.username != undefined) {
             $(".twitter-settings-username").html('<p>'+HSN.TwitterData.username+'</p>')
         }
-    } else if (event.data.message == "UpdateCryptoChanges") {
-        HSN.UpdateCryptoChanges(event.data.changes)
     } else if(event.data.message == "PlaySound") {
         HSN.PlaySound(event.data)
     }
 })
-
-
 
 
 $(document).on('click', '.bills-payall', function(e){
@@ -221,19 +207,12 @@ $(document).on('click', '.gallery-photos', function(e){
 });
 
 
-
 $(document).on('click', '.messages-openedchat-message-photo img', function(e){
     HSN.ShowPhotoOnScreen($(this).attr("src"))
 });
 $(document).on('click', '.ads-index-tooltip-msgside-photo img', function(e){
     HSN.ShowPhotoOnScreen($(this).attr("src"))
 });
-
-
-
-
-
-
 
 
 $(document).on('click', '.messages-index', function(e){
@@ -510,40 +489,11 @@ $(document).on('click', '.ads-send', function(e){
 });
 
 
-
-$(document).on('click', '.finance-buyside-icons-index', function(e){
-    var SelectedCryptoValue = $(this).attr('cryptoindex')
-    var PressedObject = $(".finance-buyside-icons").find('[cryptoindex="'+SelectedCryptoValue+'"]');
-    if (CurrentCryptoValue !== SelectedCryptoValue) {
-        var PreviousObject = $(".finance-buyside-icons").find('[cryptoindex="'+CurrentCryptoValue+'"]');
-        $(PreviousObject).removeClass('selectedcrypto');
-        $(PressedObject).addClass('selectedcrypto');
-        CurrentCryptoValue = SelectedCryptoValue
-        $(".commission").html("Commission = "+HSN.CryptoCommissions[CurrentCryptoValue]+"%")
-    }
-});
-
-
 $(document).on('click', '.contacts-keyboard', function(e){
     HSN.ShowGoBack(true,"keyboard")
     $(".contacts-mainside").fadeOut()
     $(".contact-keyboard-page").fadeIn()
 });
-
-
-
-
-$(document).on('click', '.buyside-newTransaction', function(e){
-    var amount = document.getElementById("finance-amount").value
-    var target = document.getElementById("transaction").value
-    if (CurrentCryptoValue != undefined) {
-        $.post("http://hsn-phone/TransferCrypto", JSON.stringify({crypto : CurrentCryptoValue, amount : amount, targetId : target}));
-        HSN.ClearValues("id","finance-amount")
-        HSN.ClearValues("id","transaction")
-    } 
-});
-
-
 
 
 $(document).on('click', '.ambulance-topButtons', function(e){
@@ -766,63 +716,10 @@ $(document).on('click', '.bottomside-settings', function(e){
 
 
 
-$(document).on('click', '.rotate', function(e){
-    var id = $(this).attr("id")
-    if (id != undefined) {
-        $(".finance-bottomside").find("[cryptoid="+id+"]").css({'display':'block'}).animate({
-            left: "-80%",
-        }, 500, function(){
-            $(".finance-bottomside").find("[cryptoid="+id+"]").css({'display':'none'});
-            $(".finance-bottomside").find("[cryptoid2="+id+"]").css({'display':'block'}).animate({
-                right: "0",
-            }, 500);
-        });
-    }
-});
-
-
 $(document).on('click', '.messages-openedchat-message-gps i', function(e){
     $.post("http://hsn-phone/SetLocation", JSON.stringify({x : $(this).attr("coord-x"), y : $(this).attr("coord-y"), z : $(this).attr("coord-z") }));
 });
 
-
-
-
-
-$(document).on('click', '.rotate2', function(e){
-    var id = $(this).attr("id2")
-    if (id != undefined) {
-        $(".finance-bottomside").find("[cryptoid2="+id+"]").css({'display':'block'}).animate({
-            right: "-80%",
-        }, 500, function(){
-            $(".finance-bottomside").find("[cryptoid2="+id+"]").css({'display':'none'});
-
-            $(".finance-bottomside").find("[cryptoid="+id+"]").css({'display':'block'}).animate({
-                left: "0",
-            }, 500);
-
-        });
-    }
-});
-
-$(document).on('click', '.crypto-iconnn', function(e){
-    var id = $(this).attr("idd")
-    var CryptoCurrency = (id).split("-")[1]
-    if (id.includes('buy')) { // check string
-        var amount = document.getElementById("crypto-buy-amount-"+CryptoCurrency+"-buy").value
-        $.post("http://hsn-phone/BuyOrSellCryptoCurrency", JSON.stringify({type : "buy", amount : amount, crypto : CryptoCurrency}));
-    } else if (id.includes('sell')) { // check string
-        var amount = document.getElementById("crypto-buy-amount-"+CryptoCurrency+"-sell").value
-        $.post("http://hsn-phone/BuyOrSellCryptoCurrency", JSON.stringify({type : "sell", amount : amount, crypto : CryptoCurrency}));
-    }
-});
-
-
-$(document).on('click', '.finance-buybutton', function(e){
-    $(".finance-main").fadeOut()
-    $(".finance-buy-side").fadeIn()
-    HSN.ShowGoBack(true, "finance-buy-side")
-});
 
 $(document).on('click', '.hsn-phonemain-closephone', function(e){
     HSN.ClosePhone()
@@ -1005,20 +902,6 @@ function copyFormatted (html) {
     document.body.removeChild(container)
   }
   
-
-
-$(document).on('click', '.cryptocurrency-decrease', function(e){
-    selectedBox = $(this).find("p").html();
-    copyFormatted(selectedBox) 
-    //HSN.PhoneShowNotification("Coppied!","success")
-});
-
-$(document).on('click', '.finance-cryptoid', function(e){
-    selectedBox = $(this).html();
-    copyFormatted(selectedBox) 
-    //HSN.PhoneShowNotification("Coppied!","success")
-});
-
 
 
 $(document).on('click', '.save-icon', function(e){
@@ -1402,7 +1285,7 @@ $(document).on('click', '.state-jobs-name', function(e){
 HSN.SetActiveJobs = function(cur) {
     var message = ""
     if (cur == "police") {
-        message = "Active Polices"
+        message = "Active Police"
     } else if (cur == "ambulance") {
         message = "Active Doctors"
     } else if (cur == "lawyer") {
@@ -1674,9 +1557,6 @@ HSN.OpenApp = function(appname) {
     } else if (appname == "Cars") {
         HSN.GetPlayerCars()
         HSN.OpenAppPage(".hsn-phonemain-cars-entry",1)
-    } else if (appname == "Finance") {
-        HSN.GetTransactions()
-        HSN.OpenAppPage(".hsn-phonemain-finance-entry",1)
     } else if (appname == "Billings") {
         HSN.GetBills()
         HSN.OpenAppPage(".hsn-phonemain-billing-entry",1)
@@ -1706,7 +1586,7 @@ HSN.OpenApp = function(appname) {
     } else if (appname == "gallery") {
         HSN.OpenAppPage(".hsn-phonemain-gallery-entry",1)
         HSN.GetGalleryPhotos()
-    } else if (appname == "Polices") {
+    } else if (appname == "Police") {
         HSN.OpenAppPage(".hsn-phonemain-police-entry",1)
     } else if (appname == "messages") {
         HSN.GetMessagePlayers()
@@ -1716,22 +1596,6 @@ HSN.OpenApp = function(appname) {
         HSN.OpenAppPage(".hsn-phonemain-ads-entry",1)
     }
 }
-
-HSN.GetTransactions = function() {
-    $.post('http://hsn-phone/GetTransactions', JSON.stringify({}), function(data){
-        if (data.length == 0) {
-            $(".finance-transactions-none").fadeIn()
-        } else {
-            $(".finance-transactions-none").fadeOut()
-            for(i = 0; i < (data.length); i++) {
-                var icon = HSN.GetCryptoIcon(data[i].crypto)
-                $(".finance-transactions-container").find("[id='"+i+"']").remove();
-                $(".finance-transactions-container").append('<div class="finance-transactions-container-index" id='+i+'><div class="finance-transactions-container-index-icon">'+icon+'</div><div class="finance-transactions-container-index-label">Transaction </div><div class="finance-transactions-container-index-label">Amount</div><div class="finance-transactions-container-index-text">'+data[i].target+'</div><div class="finance-transactions-container-index-text">'+data[i].amount+'</div></div>')
-            };
-        }
-    })  
-}
-
 
 
 HSN.DeleteBill = function(id) {
@@ -1795,19 +1659,6 @@ HSN.GetBills = function() {
         }
     })   
 }
-
-HSN.GetCryptoIcon = function(crypto) {
-    if (crypto == "bitcoin") {
-        return '<i class="fab fa-btc"></i>';
-    } else if (crypto == "ethereum") {
-        return '<i class="fab fa-ethereum"></i>';
-    } else if (crypto == "ggcoin") {
-        return '<i class="fab fa-gg"></i>';
-    } else if (crypto == "devcoin") {
-        return '<i class="fab fa-dev"></i>';
-    }
-}
-
 
 
 HSN.CloseApp = function(appname) {
@@ -1980,13 +1831,6 @@ HSN.GoBack = function(id) {
     } else if (id == "Gallery") {
         HSN.CloseAppPage(".hsn-phonemain-gallery-entry",-100)
         HSN.ShowGoBack(false)
-    } else if (id == "finance-buy-side") {
-        $(".finance-buy-side").fadeOut()
-        $(".finance-main").fadeIn()
-        HSN.ShowGoBack(true, "Finance")
-    } else if (id  == "Finance") {
-        HSN.CloseAppPage(".hsn-phonemain-finance-entry",-100)
-        HSN.ShowGoBack(false)
     } else if (id == "newnote") {
         $(".shownote").css({'display':'block'}).animate({
             top: "-90%",
@@ -2006,7 +1850,7 @@ HSN.GoBack = function(id) {
     } else if (id == "gallery" ) {
         HSN.CloseAppPage(".hsn-phonemain-gallery-entry",-100)
         HSN.ShowGoBack(false)
-    } else if (id == "Polices") {
+    } else if (id == "Police") {
         HSN.CloseAppPage(".hsn-phonemain-police-entry",-100)
         HSN.ShowGoBack(false)
     } else if (id == "PoliceShowPly") {
@@ -2015,7 +1859,7 @@ HSN.GoBack = function(id) {
         }, 500, function(){
             $(".police-showply").css({'display':'none'});
             $(".police-indexside").fadeIn()
-            HSN.ShowGoBack(true, "Polices")
+            HSN.ShowGoBack(true, "Police")
 
         });
     } else if (id == "PoliceShowVeh") {
@@ -2024,7 +1868,7 @@ HSN.GoBack = function(id) {
         }, 500, function(){
             $(".police-showvehdata").css({'display':'none'});
             $(".police-indexside").fadeIn()
-            HSN.ShowGoBack(true, "Polices")
+            HSN.ShowGoBack(true, "Police")
         });
     } else if (id == "s-pagebackground") {
         $(".settings-pages-background").css({'display':'block'}).animate({
@@ -2110,9 +1954,6 @@ HSN.SetAppColor = function(appName) {
     } else if (appName == "Cars") {
         $(".hsn-phonemain-apps").find("[appname="+appName+"]").css({"background-color":"#339977"})
         //$(".hsn-phonemain-apps").find("[appname="+appName+"]").find("i").css({"left":"17%"})
-    } else if (appName == "Finance") {
-        $(".hsn-phonemain-apps").find("[appname="+appName+"]").css({"background-color":"#993833"})
-       // $(".hsn-phonemain-apps").find("[appname="+appName+"]").find("i").css({"padding-left":"32%"})
     } else if (appName == "Advertisement") {
         //$(".hsn-phonemain-apps").find("[appname="+appName+"]").find("i").css({"left":"15%"})
         //$(".hsn-phonemain-apps").find("[appname="+appName+"]").find("i").css({"color":"#247ba0;"})
@@ -2133,8 +1974,6 @@ HSN.AddNewApp = function(appName) {
         appIcon =  '<i class="fab fa-twitch"></i>'
     }else if (appName == "Advertisement") {
         appIcon =  '<i class="fas fa-ad"></i>'
-    }else if (appName == "Finance") {
-        appIcon = '<i class="fas fa-wallet"></i>'
     }else if (appName == "Cars") {
         appIcon = '<i class="fas fa-car"></i>'
     }
@@ -2149,17 +1988,10 @@ HSN.AddNewApp = function(appName) {
     $(".hsn-phonemain-apps-entry").find("[id="+appName+"]").addClass("hoverappstore")
 }
 
-
-
-
-
 // HSN.AddNewApp("Twitter")
-// HSN.AddNewApp("Finance")
 // HSN.AddNewApp("Cars")
 // HSN.AddNewApp("Ads")
 // HSN.AddNewApp("Twitch")
-//s
-
 
 
 HSN.SetBackgroundImage = function(image) {
@@ -2174,8 +2006,6 @@ HSN.AddNewNotification = function(data) {
         appIcon =  '<i class="fab fa-tiktok"></i>'
     }else if (data.app == "Notes") {
         appIcon =  '<i class="fas fa-clipboard"></i>'
-    }else if (data.app == "Finance") {
-        appIcon = '<i class="fas fa-wallet"></i>'
     }else if (data.app == "Cars") {
         appIcon = '<i class="fas fa-car"></i>'
     }else if (data.app == "App Store") {
@@ -2740,7 +2570,6 @@ HSN.SetPhotos = function(data) {
 
 HSN.SetBankBalance = function(amount) {
     $(".bank-üstbilgiler-amount-index").html("$"+amount.toFixed(2))
-    $(".finance-totalbalance-index").html("$"+amount.toFixed(2))
 }
 
 HSN.SetBankPhoto =  function(photo) {
@@ -2859,29 +2688,6 @@ HSN.OpenAppPage = function(selector,Percentage) {
     }, 500);
 }
 
-HSN.SetCryptoName = function(firstname, lastname, cryptoid, bank) {
-        $(".finance-plyname").html(firstname+" "+lastname)
-        $(".finance-cryptoid").html(cryptoid)
-        $(".finance-totalbalance-index").html("$"+bank.toFixed(2))
-    
-}
-
-HSN.SetCryptoData = function(cryptoTable) {
-    if (cryptoTable) {
-        $.each(cryptoTable, function (i, result) {
-            if (result == "0") {
-                result = "0.0"
-            }
-            $(".cryptocurrency-side-index").find("[financeid="+i+"]").find("p").html(result)
-        })
-    }
-}
-
-HSN.AddNewCryptoTransfer = function(data) {
-    $(".finance-transactions-none").fadeOut()
-    var icon = HSN.GetCryptoIcon(data.crypto)
-    $(".finance-transactions-container").append('<div class="finance-transactions-container-index" id='+data.id+'><div class="finance-transactions-container-index-icon">'+icon+'</div><div class="finance-transactions-container-index-label">Transaction </div><div class="finance-transactions-container-index-label">Amount</div><div class="finance-transactions-container-index-text">'+data.target+'</div><div class="finance-transactions-container-index-text">'+data.amount+'</div></div>')
-}
 
 HSN.OpenPhoneForNotifications = function(result) {
     if (result.type == "call-src") {
@@ -2945,13 +2751,6 @@ HSN.OpenPhoneForNotifications = function(result) {
 
 GenerateRandomId = function() {
     return Math.random()
-}
-
-HSN.UpdateCryptoValues = function(crypto, value) {
-    if (value == "0") {
-        value = "0.0"
-    }
-    $(".cryptocurrency-side-index").find("[financeid="+crypto+"]").find("p").html(value)
 }
 
 
@@ -3227,8 +3026,6 @@ HSN.SetupApps = function (apps) {
                 appIcon =  '<i class="fab fa-twitch"></i>'
             }else if (result == "Advertisement") {
                 appIcon =  '<i class="fas fa-ad"></i>'
-            }else if (result == "Finance") {
-                appIcon = '<i class="fas fa-wallet"></i>'
             }else if (result == "Cars") {
                 appIcon = '<i class="fas fa-car"></i>'
             }
@@ -3270,7 +3067,7 @@ HSN.GenerateRandomStr = function(length) {
 HSN.AddJobApp = function(job) {
     if (job == "police") {
         if (set[job] == undefined) {
-            $(".hsn-phonemain-apps").append('<div class="hsn-phone-apps" id="Polices"><div class="hsn-phone-apps-iconside" style="background-color: #00509d;"><i class="fas fa-user-shield"></i></div><div class="hsn-phone-apps-textside">Polices</div></div>')
+            $(".hsn-phonemain-apps").append('<div class="hsn-phone-apps" id="Police"><div class="hsn-phone-apps-iconside" style="background-color: #00509d;"><i class="fas fa-user-shield"></i></div><div class="hsn-phone-apps-textside">Police</div></div>')
             set[job] = "Ananı sikeyim"
         }
     } else if (job == "ambulance") {
@@ -3498,20 +3295,6 @@ HSN.SearchMessages = function() {
 }
 
 
-HSN.UpdateCryptoChanges = function(changes) {
-    $.each(changes, function (i, result) {
-        if (result.change == "same") {
-            $(".cryptocurrency-side").find("[id="+i+"]").find(".cryptocurrency-side-index-change").css({"background-color": "#fca311"})
-        } else if(result.change == "up") {
-            $(".cryptocurrency-side").find("[id="+i+"]").find(".cryptocurrency-side-index-change").css({"background-color": "#29bf12"})
-        } else if(result.change == "down") {
-            $(".cryptocurrency-side").find("[id="+i+"]").find(".cryptocurrency-side-index-change").css({"background-color": "#9e2a2b"})
-            
-        }
-        //$(".cryptocurrency-side-index").find("[financeid="+i+"]").find("p").html(value)
-    })
-    
-}
 var audioPlayer = null;
 // Listen for NUI Messages.
 window.addEventListener('message', function(event) {
