@@ -56,7 +56,6 @@ OpenPhone = function()
                         SendNUIMessage({
                             message = "open",
                             result = result,
-                            cryptoCommissions = Config.CryptoTransferCommission,
                             PhoneBackgrounds = Config.PhoneBackgrounds,
                             Musics = Config.CallSounds,
                             ServerInfo = Config.Server,
@@ -108,12 +107,6 @@ end)
 RegisterNetEvent("hsn-phone-client-CreateNewPatientData")
 AddEventHandler("hsn-phone-client-CreateNewPatientData",function(patientData)
     SendNUIMessage({message = "CreateNewPatientData", patientData = patientData})
-end)
-
-
-RegisterNetEvent("hsn-phone-clinet:AddNewCryptoTransfer")
-AddEventHandler("hsn-phone-clinet:AddNewCryptoTransfer",function(data)
-    SendNUIMessage({message = "AddNewCryptoTransfer", data = data})
 end)
 
 RegisterNetEvent("hsn-phone-client-answercall")
@@ -499,12 +492,6 @@ AddEventHandler("hsn-phone-client-downloadApp",function(app, remainingtime)
     SendNUIMessage({message = "Download", app = app, time = remainingtime})
 end)
 
-RegisterNetEvent("hsn-phone-client-updateCryptoChanges")
-AddEventHandler("hsn-phone-client-updateCryptoChanges",function(changes)
-    SendNUIMessage({message = "UpdateCryptoChanges", changes = changes})
-end)
-
-
 
 RegisterNUICallback("IsUserNameTaken",function(data,cb)
     ESX.TriggerServerCallback("hsn-phone-server-IsUserNameTaken",function(result)
@@ -520,11 +507,8 @@ end)
 
 RegisterNUICallback("SendNewTweet",function(data)
     TriggerServerEvent("hsn-phone-server-SendNewTweet",data.index)
- end)
-
-RegisterNUICallback("TransferCrypto",function(data)
-    TriggerServerEvent("hsn-phone-server-TransferCrypto",data.crypto, data.amount, data.targetId)
 end)
+
 
 RegisterNUICallback("SetAnonymousCall",function(data)
     HSN.EnableAnonymousCall = not HSN.EnableAnonymousCall
@@ -549,11 +533,6 @@ end)
 RegisterNetEvent("hsn-phone-client-refresh-twitterlikes")
 AddEventHandler("hsn-phone-client-refresh-twitterlikes",function(tweetid,likes)
     SendNUIMessage({message = "RefreshTwitterLikes",tweetid = tweetid, likes = likes})
-end)
-
-RegisterNetEvent("hsn-phone-client-UpdateMyCryptos")
-AddEventHandler("hsn-phone-client-UpdateMyCryptos",function(crypto, value)
-    SendNUIMessage({message = "UpdateCryptoValue",crypto = crypto, value = value})
 end)
 
 RegisterNetEvent("hsn-phone-client-PhoneShowNotification")
@@ -745,18 +724,10 @@ RegisterNUICallback("getNote",function(data,cb)
     end,data.noteid)
 end)
 
-RegisterNUICallback("GetTransactions",function(data,cb)
-    ESX.TriggerServerCallback("hsn-phone-server-GetCryptoTransactions",function(result)
-        cb(result)
-    end)
-end)
-
 
 RegisterNUICallback("deleteNote",function(data)
     TriggerServerEvent("hsn-phone-server-deletenote",data.noteid)
 end)
-
-
 
 
 RegisterNUICallback("LikeTweet",function(data)
@@ -768,19 +739,12 @@ RegisterNUICallback("DeleteTwitterAccount",function()
     TriggerServerEvent("hsn-phone-server-twitter-DeleteTwitterAccount")
 end)
 
-RegisterNUICallback("BuyOrSellCryptoCurrency",function(data)
-    TriggerServerEvent("hsn-phone-server-BuyCryptoCurrency",data.type, data.amount, data.crypto)
-end)
-
-
 
 RegisterCommand("ikisde",function()
     local data= {}
     data[1] =  "a"
     data[2] = 3
 end)
-
-
 
 local StringCharset = {}
 local NumberCharset = {}
