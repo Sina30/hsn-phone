@@ -1,6 +1,11 @@
 # hsn-phone
 hsn-phone for fivem
 
+# Requirements
+* [pma-voice](https://github.com/AvarianKnight/pma-voice) or [mumble-voip](https://github.com/FrazzIe/mumble-voip-fivem)
+* [ESX Legacy (Recommended)](https://github.com/overextended/es_extended/releases/tag/Legacy)
+* [ghmattimysql](https://github.com/GHMatti/ghmattimysql) - Until oxmysql switch
+
 # ghattimysql export
 Add to ghmattimysql-server.lua
 ```
