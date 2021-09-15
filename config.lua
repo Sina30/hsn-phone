@@ -1,5 +1,5 @@
 Config = Config or {}
-Config.DB = "ghmattimysql" -- or "mysql-async"
+Config.DB = "ghmattimysql" -- changes in the works
 Config.DownloadTimer = {
     ["Twitter"] = 15000, 
     ["Twitch"] = 3000,
