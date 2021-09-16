@@ -16,7 +16,7 @@ TriggerEvent("esx:getSharedObject",function(obj)
     ESX = obj
 end)
 
-local users = exports.oxmysql:fetchSync('SELECT * FROM users', {}) 
+local users = exports.oxmysql:fetch('SELECT * FROM users', {}) 
 for k,v in pairs(users[1]) do
         if PhoneData[v.identifier] == nil then
             PhoneData[v.identifier] = {}
@@ -69,7 +69,7 @@ for k,v in pairs(users[1]) do
         end
     end
     
-    local mails = exports.oxmysql:fetchSync('SELECT * FROM hsn_phone_mails', {}) 
+    local mails = exports.oxmysql:fetch('SELECT * FROM hsn_phone_mails', {}) 
     for k,v in ipairs(mails[1]) do
         if PhoneData[v.owner].mails == nil then
             PhoneData[v.owner].mails = {}
@@ -78,7 +78,7 @@ for k,v in pairs(users[1]) do
     end
     Citizen.Wait(10)
 
-    local notes = exports.oxmysql:fetchSync('SELECT * FROM hsn_phone_notes', {}) 
+    local notes = exports.oxmysql:fetch('SELECT * FROM hsn_phone_notes', {}) 
     for k,v in ipairs(notes[1]) do
         if PhoneData[v.owner].notes == nil then
             PhoneData[v.owner].notes = {}
@@ -88,7 +88,7 @@ for k,v in pairs(users[1]) do
         table.insert(PhoneData[v.owner].notes,noteData)
     end
 
-    local accounts = exports.oxmysql:fetchSync('SELECT * FROM hsn_phone_twitter_accounts', {}) 
+    local accounts = exports.oxmysql:fetch('SELECT * FROM hsn_phone_twitter_accounts', {}) 
     for k,v in ipairs(accounts[1]) do
         TwitterAccounts[v.username] = {}
         TwitterAccounts[v.username].owner = v.owner
@@ -97,7 +97,7 @@ for k,v in pairs(users[1]) do
         TwitterAccounts[v.username].username = v.username
     end 
 
-    local PatientDatas = exports.oxmysql:fetchSync('SELECT * FROM hsn_phone_ambulancepatients', {})
+    local PatientDatas = exports.oxmysql:fetch('SELECT * FROM hsn_phone_ambulancepatients', {})
     if PatientDatas[1] then
         for k,v in ipairs(PatientDatas) do
             table.insert(AmbulancePatientDatas, v)
@@ -117,7 +117,7 @@ for k,v in pairs(users[1]) do
     end
     for o,p in pairs(PhoneData) do
 
-        local messages = exports.oxmysql:fetchSync("SELECT owner, number, data, DATE as DATE FROM hsn_phone_messages WHERE `owner` = '"..o.."' ORDER BY DATE DESC", {})
+        local messages = exports.oxmysql:fetch("SELECT owner, number, data, DATE as DATE FROM hsn_phone_messages WHERE `owner` = '"..o.."' ORDER BY DATE DESC", {})
         if messages[1] then
             
             for k,v in pairs(messages) do
@@ -154,7 +154,7 @@ end)
 ESX.RegisterServerCallback("hsn-phone-server-getmessagedata",function(source,cb)
     local Player = ESX.GetPlayerFromId(source)
     local returnData = {}
-    local messages = exports.oxmysql:fetchSync("SELECT owner, number, data, DATE as DATE FROM hsn_phone_messages WHERE `owner` = '"..Player.identifier.."' ORDER BY DATE DESC", {}) 
+    local messages = exports.oxmysql:fetch("SELECT owner, number, data, DATE as DATE FROM hsn_phone_messages WHERE `owner` = '"..Player.identifier.."' ORDER BY DATE DESC", {}) 
         if messages[1] then
             for k,v in pairs(messages) do
                 local PlayerT = HSN.GetPlayerFromPhoneNumber(v.number)
@@ -600,7 +600,7 @@ AddEventHandler("hsn-phone-server-togglelike",function(tweetId)
     local Player = ESX.GetPlayerFromId(source)
     local PlayerData = {}
     local ReturnData = {}
-    local result = exports.oxmysql:fetchSync('SELECT * FROM hsn_phone_tweets WHERE id = @id', {
+    local result = exports.oxmysql:fetch('SELECT * FROM hsn_phone_tweets WHERE id = @id', {
         ['@id']  = tweetId
     })
     if TwitterLikes[tweetId] ~= nil then
@@ -684,7 +684,7 @@ end
 
 ESX.RegisterServerCallback("hsn-phone-server-getTweets",function(source,cb)
     local returnData = {}
-    local tweets = exports.oxmysql:fetchSync('SELECT * FROM hsn_phone_tweets', {})
+    local tweets = exports.oxmysql:fetch('SELECT * FROM hsn_phone_tweets', {})
     for k,v in ipairs(tweets) do
         if TwitterLikes[v.id] == nil then
             TwitterLikes[v.id] = {}
@@ -1068,7 +1068,7 @@ end)
 
 HSN.GetPlayerCharacterName = function(identifier) 
     if identifier == nil then return "Unknown" end
-    local result = exports.oxmysql:fetchSync('SELECT * FROM users WHERE identifier = @identifier', {
+    local result = exports.oxmysql:fetch('SELECT * FROM users WHERE identifier = @identifier', {
         ['@identifier']  = identifier
     })
     if result[1].firstname and result[1].lastname then
@@ -1192,7 +1192,7 @@ ESX.RegisterServerCallback("hsn-phone-server-getPlayerCars",function(source,cb)
     local src = source
     local Player = ESX.GetPlayerFromId(src)
     local returndata = {}
-    local result = exports.oxmysql:fetchSync('SELECT * FROM owned_vehicles WHERE owner = @owner', {
+    local result = exports.oxmysql:fetch('SELECT * FROM owned_vehicles WHERE owner = @owner', {
         ['@owner']  = Player.identifier
     })
     if result[1] ~= nil then
@@ -1370,7 +1370,7 @@ end)
 
 ESX.RegisterServerCallback("hsn-phone-server-SearchCitizen",function(source, cb, searchData)
     local playersTable = {}
-    local result = exports.oxmysql:fetchSync("SELECT * FROM users WHERE CONCAT(firstname, ' ', lastname) LIKE '%"..searchData.."%' OR phone_number LIKE '%"..searchData.."%'")
+    local result = exports.oxmysql:fetch("SELECT * FROM users WHERE CONCAT(firstname, ' ', lastname) LIKE '%"..searchData.."%' OR phone_number LIKE '%"..searchData.."%'")
     if result[1] ~= nil then
         for k,v in pairs(result) do
             if v.phonedata ~= nil then
@@ -1394,7 +1394,7 @@ end)
 
 ESX.RegisterServerCallback("hsn-phone-server-SearchVehicle",function(source, cb, searchData)
     local vehicleTable = {}
-    local result = exports.oxmysql:fetchSync("SELECT * FROM owned_vehicles WHERE CONCAT(plate) LIKE '%"..searchData.."%'")
+    local result = exports.oxmysql:fetch("SELECT * FROM owned_vehicles WHERE CONCAT(plate) LIKE '%"..searchData.."%'")
     if result[1] ~= nil then
         for k,v in pairs(result) do
             if PhoneData[v.owner] then
@@ -1565,7 +1565,7 @@ AddEventHandler("hsn-phone-server-SendMessage",function(data)
     MessageData.messagetime = data.messagetime
     table.insert(PhoneData[Player.identifier].messages[data.number].localmessages, MessageData)
     TriggerClientEvent("hsn-phone-client-updatemessages",source, MessageData, PhoneData[Player.identifier].messages, data.number)
-    local result = exports.oxmysql:fetchSync('SELECT * FROM hsn_phone_messages WHERE owner = @owner AND number = @number', {
+    local result = exports.oxmysql:fetch('SELECT * FROM hsn_phone_messages WHERE owner = @owner AND number = @number', {
         ['@owner']  = Player.identifier,
         ['@number'] = data.number
     })
@@ -1614,7 +1614,7 @@ AddEventHandler("hsn-phone-server-SendMessage",function(data)
             table.insert(PhoneData[ESXTARGETPLAYER.identifier].messages[srcPlayerPhoneNumber].localmessages, MessageData)
             TriggerClientEvent("hsn-phone-client-updatemessages",ESXTARGETPLAYER.source, MessageData, PhoneData[ESXTARGETPLAYER.identifier].messages, PhoneData[Player.identifier].phonenumber )
             TriggerClientEvent("hsn-phone-client:NewNotification",ESXTARGETPLAYER.source,{type = "message",message = "New Message from "..FormatGetContact(ESXTARGETPLAYER.identifier, srcPlayerPhoneNumber)..'!', icon = '<i class="fas fa-comment-alt"></i>', background = "#197278", app = "Messages", duration = 3000})
-            local result = exports.oxmysql:fetchSync('SELECT * FROM hsn_phone_messages WHERE owner = @owner AND number = @number', {
+            local result = exports.oxmysql:fetch('SELECT * FROM hsn_phone_messages WHERE owner = @owner AND number = @number', {
                 ['@owner']  = ESXTARGETPLAYER.identifier,
                 ['@number'] = srcPlayerPhoneNumber
             })
@@ -1660,7 +1660,7 @@ AddEventHandler("hsn-phone-server-SendMessage",function(data)
             MessageData.messagetime = data.messagetime
             table.insert(PhoneData[Target.identifier].messages[srcPlayerPhoneNumber].localmessages, MessageData)
             --TriggerClientEvent("hsn-phone-client-updatemessages",ESXTARGETPLAYER.source, PhoneData[Target.identifier].messages, PhoneData[Player.identifier].phonenumber )
-            local result = exports.oxmysql:fetchSync('SELECT * FROM hsn_phone_messages WHERE owner = @owner AND number = @number', {
+            local result = exports.oxmysql:fetch('SELECT * FROM hsn_phone_messages WHERE owner = @owner AND number = @number', {
                 ['@owner']  = Target.identifier,
                 ['@number'] = srcPlayerPhoneNumber
             })
@@ -1738,8 +1738,6 @@ HSN.SendLog = function(app, webhook, message, photo, playerphoto)
         return
     end
 
-
-
     local headers = {
         ['Content-Type'] = 'application/json'
     }
@@ -1758,5 +1756,3 @@ HSN.SendLog = function(app, webhook, message, photo, playerphoto)
     data['embeds'][1]['description'] = '**New Tweet!** \n ' ..message
     PerformHttpRequest(webhook, function(err, text, headers) end, 'POST', json.encode(data), headers)
 end
-
-
