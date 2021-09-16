@@ -1254,18 +1254,14 @@ end)
 
 
 
-ESX.RegisterServerCallback("hsn-phone-server:GetItemCount",function(source,cb,item)
-    local xPlayer = ESX.GetPlayerFromId(source)
-
-    if xPlayer ~= nil then
-        local HasPhone = xPlayer.getInventoryItem("phone").count
-
-        if HasPhone >= 1 then
-            cb(true)
+ESX.RegisterServerCallback('hsn-phone-server:GetItemCount', function(source, cb, item)
+	local xPlayer = ESX.GetPlayerFromId(source)
+        local items = xPlayer.getInventoryItem(item)
+		        if items == nil then
+            cb(0)
         else
-            cb(false)
+            cb(items.count)
         end
-    end
 end)
 
 RegisterServerEvent("hsn-phone-server-call")
