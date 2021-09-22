@@ -1815,5 +1815,3 @@ HSN.SendLog = function(app, webhook, message, photo, playerphoto)
     data['embeds'][1]['description'] = '**New Tweet!** \n ' ..message
     PerformHttpRequest(webhook, function(err, text, headers) end, 'POST', json.encode(data), headers)
 end
-
-
