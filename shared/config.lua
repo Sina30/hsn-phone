@@ -1,5 +1,4 @@
 Config = Config or {}
-Config.DB = "oxmysql" -- or "mysql-async"
 Config.DownloadTimer = {
     ["Twitter"] = 15000, 
     ["Twitch"] = 3000,
@@ -24,7 +23,7 @@ Config.PhoneBackgrounds = {
 }
 Config.Server = {
     Photo = "https://i.imgur.com/xW8qWeR.png",
-    Name = "Night Owls RP"
+    Name = "WATERMELON"
 }
 Config.JobNames = {
     ["police"] = true, -- police and ambulance app 
