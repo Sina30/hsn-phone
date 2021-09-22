@@ -1,6 +1,6 @@
 Config = Config or {}
 Config.DownloadTimer = {
-    ["Twitter"] = 15000, 
+    ["Twitter"] = 5000, 
     ["Twitch"] = 3000,
     ["Advertisement"] = 4000,
     ["Cars"] = 5000,
