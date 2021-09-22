@@ -11,8 +11,8 @@ Config.TelfixCommand = "phonenuifix" -- or nil --
 
 Config.Voip = "pma-voice" -- or mumble or pma-voice
 Config.Webhooks = {
-    ["Camera"] = "https://discord.com/api/webhooks/880207038301495346/5MwAKCvL-DKAHB5W59KYWOjAPyRwpukkJHEn3gJ6dKto4klFSxtcBZgXwT2ohOyY40YD",
-    ["Twitter"] = "https://discord.com/api/webhooks/884929042564911115/wW1Mic-kcFNnCXYSXYr8JePNH4yC60JkE_9HXr1vNMa4h9Ksz_bkJwUtGShQEoAiEt3_"
+    ["Camera"] = "changeme",
+    ["Twitter"] = "changeme"
 }
 Config.PhoneBackgrounds = {
     "https://i.imgur.com/pLZQTQ1.jpg",
