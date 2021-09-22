@@ -22,16 +22,10 @@ Config.PhoneBackgrounds = {
     "https://i.imgur.com/EMKIiCg.jpg"
 }
 Config.Server = {
-    Photo = "https://i.imgur.com/xW8qWeR.png",
+    Photo = "changeme",
     Name = "WATERMELON"
 }
 Config.JobNames = {
     ["police"] = true, -- police and ambulance app 
     ["ambulance"] = true
 }
-
-
-
-
-
-
