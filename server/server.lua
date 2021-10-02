@@ -876,8 +876,8 @@ HSN.AddNewNote = function(src,noteData)
     exports.ghmattimysql:execute('INSERT INTO hsn_phone_notes (owner, noteData) VALUES (@owner, @noteData)', {
         ['@owner']   = Player.identifier,
         ['@noteData']   = json.encode(noteData),
-    }, function(result)
-        noteData.id = result.insertId
+    }, function(insertId)
+        noteData.id = insertId
         table.insert(PhoneData[Player.identifier].notes,noteData)
         TriggerClientEvent("hsn-phone-client-addNewNote",src,noteData)
     end)
